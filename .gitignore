@@ -1,3 +1,8 @@
 nimcache/
 nimblecache/
 htmldocs/
+
+tests/*.exe
+*.dll
+tests/*.png
+*.a
