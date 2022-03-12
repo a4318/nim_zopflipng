@@ -52,6 +52,18 @@ proc optPngDef*(pngMem: MemFile, pngbuf: ptr uint8) : uint =
   echo(fmt"reduce {(float)((pngMem.size - outsize.int)*100)/(float)pngMem.size}%: {epochTime() - t}")
   return outsize
 
+proc optPngDef*(size: int, inbuf, pngbuf: ptr uint8) : uint =
+  let t = epochTime()
+  var option = CZopfliPNGOptions()
+  CZopfliPNGSetDefaults(option.addr)
+  var outsize: uint
+  let output = createU(uint8, 1)
+  if CZopfliPNGOptimize(inbuf, size.uint, option.addr, 1, output.unsafeAddr, outsize.addr) != 0:
+    return 0.uint
+  copyMem(pngbuf, output, outsize)
+  echo(fmt"reduce {(float)((size - outsize.int)*100)/(float)size}%: {epochTime() - t}")
+  return outsize
+
 proc optPngDef*(inpath, outpath: string) : bool {.discardable.} =
   let pngMem = memfiles.open(inpath)
   var output = createU(uint8, pngMem.size)
